@@ -22,7 +22,11 @@ const providerOptions ={
 function App() {
   const [web3Provider,setWeb3Provider] =useState(null)
   const [timer, setTimer] = useState(0);
+  const [address, setAddress] = useState();
+
   const [toggle, setToggle] = useState(false);
+  const endTime=40;
+  const notificationTime=20;
 
 
   const connectButton = async() => {
@@ -33,8 +37,10 @@ function App() {
       })
       let web3modalInstance = await web3modal.connect();
       let web3modalProvider = new ethers.providers.Web3Provider(web3modalInstance)
-      console.log(web3modalProvider)
-      console.log(web3modalProvider.getSigner())
+      const signer= web3modalProvider.getSigner()
+      setAddress(await signer.getAddress())
+      // console.log(web3modalProvider)
+      // console.log(web3modalProvider.getSigner())
       if(web3modalProvider){
         setWeb3Provider(web3modalProvider)
       }
@@ -61,7 +67,7 @@ function App() {
     if (toggle) {
       counter = setInterval(() => setTimer(timer => timer + 1), 1000);  
     }
-    if(timer>40){
+    if(timer>endTime){
       handleDisconnect()
     }
     return () => {
@@ -82,16 +88,16 @@ function App() {
           :(
           <>
           <button onClick={handleDisconnect} className="disconnect">Disconnect</button>
-          <p>Address is : {web3Provider.provider.accounts[0]}</p>
+          <p>Address is : {address}</p>
           {
-            (timer<40)&&
-            <p>Login expires in = {40-timer} sec</p>
+            (timer<endTime)&&
+            <p className="expire">Login expires in = {endTime-timer} sec</p>
             
           }
           
-          {(timer >20 ) &&
+          {(timer >notificationTime ) &&
           <div className="extend">
-          <p>Please extend for another 20 seconds of login </p>
+          <p>Please extend for another {endTime} seconds of login </p>
           <button onClick={handleReset} className="disconnect">Extend</button>
           </div>
           }
